@@ -1,71 +1,102 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface AnimatedCounterProps {
   value: number;
   suffix?: string;
   prefix?: string;
-  className?: string;
   duration?: number;
+  className?: string;
+  label?: string;
 }
 
 export function AnimatedCounter({
   value,
   suffix = "",
   prefix = "",
+  duration = 2,
   className,
-  duration = 2000,
+  label,
 }: AnimatedCounterProps) {
-  const [count, setCount] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLSpanElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  const springValue = useSpring(0, {
+    duration: duration * 1000,
+    bounce: 0,
+  });
+
+  const displayValue = useTransform(springValue, (latest) =>
+    Math.floor(latest)
+  );
+
+  const [currentValue, setCurrentValue] = useState(0);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
+    if (isInView && !hasAnimated) {
+      springValue.set(value);
+      setHasAnimated(true);
     }
-
-    return () => observer.disconnect();
-  }, []);
+  }, [isInView, hasAnimated, springValue, value]);
 
   useEffect(() => {
-    if (!isVisible) return;
-
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      setCount(Math.floor(easeOutQuart * value));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [isVisible, value, duration]);
+    const unsubscribe = displayValue.on("change", (latest) => {
+      setCurrentValue(latest);
+    });
+    return unsubscribe;
+  }, [displayValue]);
 
   return (
-    <span ref={ref} className={cn("tabular-nums", className)}>
-      {prefix}
-      {count}
-      {suffix}
-    </span>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6 }}
+      className={cn("text-center", className)}
+    >
+      <div className={cn("text-4xl md:text-5xl lg:text-6xl font-bold text-gradient")}>
+        {prefix}
+        {currentValue.toLocaleString()}
+        {suffix}
+      </div>
+      {label && (
+        <p className="text-muted-foreground mt-2">{label}</p>
+      )}
+    </motion.div>
+  );
+}
+
+// Stats grid component
+interface Stat {
+  value: number;
+  suffix?: string;
+  prefix?: string;
+  label: string;
+}
+
+interface AnimatedStatsProps {
+  stats: Stat[];
+  className?: string;
+}
+
+export function AnimatedStats({ stats, className }: AnimatedStatsProps) {
+  return (
+    <div className={cn("grid grid-cols-2 md:grid-cols-4 gap-8", className)}>
+      {stats.map((stat, index) => (
+        <AnimatedCounter
+          key={stat.label}
+          value={stat.value}
+          suffix={stat.suffix}
+          prefix={stat.prefix}
+          label={stat.label}
+          className="group"
+          // Stagger animation
+        />
+      ))}
+    </div>
   );
 }
