@@ -1,13 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { constructMetadata, siteConfig, generateOrganizationSchema } from "@/lib/seo";
+import { constructMetadata, generateOrganizationSchema } from "@/lib/seo";
 import { PageTransition } from "@/components/page-transition";
 import { ExitIntentPopup } from "@/components/exit-intent-popup";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"] });
-const geistMono = Geist_Mono({ subsets: ["latin"] });
+// Premium font combination
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({ 
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = constructMetadata();
 
@@ -64,7 +80,7 @@ export default function RootLayout({
           }}>
         </script>
       </head>
-      <body className={`${geist.className} ${geistMono.className} antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <PageTransition>
           {children}
         </PageTransition>

@@ -15,6 +15,7 @@ import {
   Send,
 } from "lucide-react";
 import { trackCTAClick, trackFormSubmit } from "@/lib/analytics";
+import { motion } from "framer-motion";
 
 const socialLinks = [
   { icon: Twitter, label: "Twitter", href: "#" },
@@ -96,58 +97,63 @@ export function Footer() {
   };
 
   return (
-    <footer ref={ref} className="bg-foreground text-background relative overflow-hidden">
+    <footer ref={ref} className="relative overflow-hidden bg-[#faf8f5]">
       {/* CTA Section */}
-      <div className="py-32 md:py-48 px-6 md:px-12 lg:px-24 relative">
-        {/* Background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/20 blur-[200px] pointer-events-none" />
+      <div className="py-32 lg:py-48 px-6 lg:px-16 relative">
+        {/* Background elements */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20"
+          style={{
+            background: "radial-gradient(circle, rgba(201,169,98,0.3) 0%, transparent 70%)",
+            filter: "blur(150px)",
+          }}
+        />
 
-        <div className="max-w-7xl mx-auto relative">
-          <div
-            className={cn(
-              "flex flex-col items-center text-center transition-all duration-1000",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-            )}
+        <div className="max-w-6xl mx-auto relative">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center text-center"
           >
-            <span className="text-sm font-medium tracking-[0.3em] uppercase text-background/50 mb-8">
-              Ready to dominate digital?
+            <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-[#6b6863] mb-8">
+              Ready to elevate your brand?
             </span>
 
-            <h2 className="text-5xl md:text-7xl lg:text-[9rem] font-bold tracking-[-0.04em] mb-12 leading-[0.9]">
-              <TextReveal>{"LET'S WORK"}</TextReveal>
+            <h2 className="font-[family-name:var(--font-playfair)] text-5xl md:text-7xl lg:text-[8rem] font-medium tracking-[-0.03em] mb-12 leading-[0.9] text-[#0a0a0b]">
+              <TextReveal>{"Let's Create"}</TextReveal>
               <br />
-              <span className="text-primary">
-                <TextReveal delay={300}>TOGETHER</TextReveal>
+              <span className="text-gradient-gold">
+                <TextReveal delay={300}>{"Together"}</TextReveal>
               </span>
             </h2>
 
             <Link href="/contact" onClick={handleCTAClick}>
-              <MagneticButton className="group px-12 py-7 bg-primary text-primary-foreground rounded-full text-xl font-semibold flex items-center gap-4 relative overflow-hidden">
+              <MagneticButton className="group px-12 py-6 bg-[#0a0a0b] text-[#faf8f5] rounded-lg text-sm font-medium tracking-wide flex items-center gap-4 relative overflow-hidden hover:shadow-[0_0_60px_rgba(0,0,0,0.2)] transition-shadow duration-500">
                 <span className="relative z-10 flex items-center gap-4">
                   Start a Project
-                  <ArrowUpRight className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  <ArrowUpRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </span>
-                <div className="absolute inset-0 bg-background translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                <span className="absolute inset-0 flex items-center justify-center gap-4 text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 z-20">
+                <div className="absolute inset-0 bg-[#c9a962] translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                <span className="absolute inset-0 flex items-center justify-center gap-4 text-[#0a0a0b] opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 z-20">
                   Start a Project
-                  <ArrowUpRight className="w-6 h-6" />
+                  <ArrowUpRight className="w-5 h-5" />
                 </span>
               </MagneticButton>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Marquee */}
-      <div className="border-t border-background/10">
-        <ScrollVelocity baseVelocity={2} className="py-8">
-          {["STRATEGY", "DESIGN", "DEVELOPMENT", "MARKETING", "GROWTH", "INNOVATION"].map(
+      {/* Marquee - Dark background */}
+      <div className="bg-[#0a0a0b] py-10 overflow-hidden">
+        <ScrollVelocity baseVelocity={2} className="py-4">
+          {["STRATEGY", "DESIGN", "DEVELOPMENT", "MARKETING", "GROWTH", "EXCELLENCE", "INNOVATION", "LUXURY"].map(
             (text, i) => (
               <span
                 key={i}
                 className={cn(
-                  "text-6xl md:text-8xl font-bold tracking-[-0.02em] mx-8",
-                  i % 2 === 0 ? "text-background/5" : "text-primary/20"
+                  "font-[family-name:var(--font-playfair)] text-5xl md:text-7xl font-medium tracking-tight mx-12 select-none",
+                  i % 2 === 0 ? "text-[rgba(255,255,255,0.03)]" : "text-[rgba(201,169,98,0.15)]"
                 )}
               >
                 {text}
@@ -157,46 +163,46 @@ export function Footer() {
         </ScrollVelocity>
       </div>
 
-      {/* Footer content */}
-      <div className="py-20 px-6 md:px-12 lg:px-24 border-t border-background/10">
+      {/* Footer content - Dark background */}
+      <div className="bg-[#0a0a0b] py-20 px-6 lg:px-16">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
             {/* Logo & description + Newsletter */}
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center gap-3 mb-6">
                 <div className="relative w-10 h-10">
-                  <div className="absolute inset-0 bg-primary rounded-lg rotate-45" />
-                  <span className="absolute inset-0 flex items-center justify-center text-primary-foreground font-bold text-lg">
+                  <div className="absolute inset-0 bg-[#c9a962] rounded-sm rotate-45" />
+                  <span className="absolute inset-0 flex items-center justify-center text-[#0a0a0b] font-[family-name:var(--font-playfair)] font-bold text-lg">
                     I
                   </span>
                 </div>
-                <span className="text-2xl font-bold tracking-tight">
-                  IGEN<span className="text-primary">&</span>PAXY
+                <span className="font-[family-name:var(--font-playfair)] text-xl font-medium tracking-tight text-[#faf8f5]">
+                  IGEN<span className="text-[#c9a962]">&</span>PAXY
                 </span>
               </Link>
-              <p className="text-background/50 max-w-md leading-relaxed mb-8">
+              <p className="text-[#a8a5a0] max-w-md leading-relaxed mb-10">
                 Award-winning digital marketing agency crafting immersive
-                experiences that transform brands and drive exponential growth.
+                experiences that transform premium brands and drive exponential growth.
               </p>
 
               {/* Newsletter signup */}
               <div className="max-w-md">
-                <h4 className="font-semibold mb-4 text-background/80">
+                <h4 className="text-xs font-medium tracking-[0.15em] uppercase text-[#6b6863] mb-5">
                   Subscribe to our newsletter
                 </h4>
-                <form onSubmit={handleSubscribe} className="flex gap-2">
+                <form onSubmit={handleSubscribe} className="flex gap-3">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
                     required
-                    className="flex-1 px-4 py-3 bg-background/10 border border-background/20 rounded-xl text-background placeholder:text-background/30 outline-none focus:border-primary transition-colors"
+                    className="flex-1 px-5 py-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-lg text-[#faf8f5] placeholder:text-[#6b6863] text-sm outline-none focus:border-[rgba(201,169,98,0.4)] transition-colors"
                   />
                   <button
                     type="submit"
                     disabled={isSubscribed}
-                    className="px-4 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 disabled:opacity-70 transition-colors"
+                    className="px-5 py-4 bg-[#c9a962] text-[#0a0a0b] rounded-lg font-medium text-sm hover:bg-[#d4b876] disabled:opacity-70 transition-colors flex items-center justify-center"
                   >
                     {isSubscribed ? (
                       "Subscribed!"
@@ -205,21 +211,21 @@ export function Footer() {
                     )}
                   </button>
                 </form>
-                <p className="text-xs text-background/30 mt-3">
+                <p className="text-[10px] text-[#6b6863] mt-4">
                   Get growth tips and industry insights delivered to your inbox.
                 </p>
               </div>
 
               {/* Social links */}
-              <div className="flex gap-3 mt-8">
+              <div className="flex gap-3 mt-10">
                 {socialLinks.map((social) => (
                   <a
                     key={social.label}
                     href={social.href}
-                    className="w-12 h-12 rounded-full border border-background/20 flex items-center justify-center hover:bg-primary hover:border-primary transition-all group"
+                    className="w-12 h-12 rounded-lg border border-[rgba(255,255,255,0.08)] flex items-center justify-center hover:bg-[rgba(201,169,98,0.1)] hover:border-[rgba(201,169,98,0.3)] transition-all group"
                     aria-label={social.label}
                   >
-                    <social.icon className="w-5 h-5 text-background/50 group-hover:text-primary-foreground transition-colors" />
+                    <social.icon className="w-5 h-5 text-[#6b6863] group-hover:text-[#c9a962] transition-colors" />
                   </a>
                 ))}
               </div>
@@ -227,7 +233,7 @@ export function Footer() {
 
             {/* Services */}
             <div>
-              <h4 className="font-semibold mb-6 text-background/40 uppercase text-xs tracking-[0.2em]">
+              <h4 className="text-xs font-medium tracking-[0.2em] uppercase text-[#6b6863] mb-8">
                 Services
               </h4>
               <nav className="space-y-4">
@@ -235,7 +241,7 @@ export function Footer() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="block text-background/60 hover:text-primary transition-colors"
+                    className="block text-sm text-[#a8a5a0] hover:text-[#c9a962] transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -245,7 +251,7 @@ export function Footer() {
 
             {/* Company */}
             <div>
-              <h4 className="font-semibold mb-6 text-background/40 uppercase text-xs tracking-[0.2em]">
+              <h4 className="text-xs font-medium tracking-[0.2em] uppercase text-[#6b6863] mb-8">
                 Company
               </h4>
               <nav className="space-y-4">
@@ -253,7 +259,7 @@ export function Footer() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="block text-background/60 hover:text-primary transition-colors"
+                    className="block text-sm text-[#a8a5a0] hover:text-[#c9a962] transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -263,13 +269,13 @@ export function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-background/10 gap-4">
-            <p className="text-background/30 text-sm">
+          <div className="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-[rgba(255,255,255,0.06)] gap-6">
+            <p className="text-xs text-[#6b6863]">
               &copy; {new Date().getFullYear()} Igen & Paxy. All rights reserved.
             </p>
-            <div className="flex items-center gap-8 text-sm text-background/30">
+            <div className="flex items-center gap-8 text-xs text-[#6b6863]">
               <span>San Francisco, CA</span>
-              <span className="font-mono tabular-nums">{time} PST</span>
+              <span className="font-[family-name:var(--font-mono)] tabular-nums text-[#a8a5a0]">{time} PST</span>
             </div>
           </div>
         </div>

@@ -2,50 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { MeshDistortMaterial, Sphere } from "@react-three/drei";
-import * as THREE from "three";
 import SplitType from "split-type";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// 3D Floating Orb Component
-function FloatingOrb() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.1;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.15;
-      meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
-    }
-  });
-
-  return (
-    <Sphere ref={meshRef} args={[1, 100, 100]} scale={1.5}>
-      <MeshDistortMaterial
-        color="#1aff80"
-        distort={0.4}
-        speed={2}
-        roughness={0.2}
-        metalness={0.8}
-      />
-    </Sphere>
-  );
-}
-
-function Scene() {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1.5} />
-      <pointLight position={[-10, -10, -10]} color="#ff6b35" intensity={0.5} />
-      <FloatingOrb />
-    </>
-  );
-}
 
 export function UpgradedHero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,32 +18,32 @@ export function UpgradedHero() {
     offset: ["start start", "end start"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
     if (!headlineRef.current || !subheadRef.current) return;
 
-    // Split text into characters
+    // Split text into characters for animation
     const headline = new SplitType(headlineRef.current, { types: "chars" });
     const subhead = new SplitType(subheadRef.current, { types: "words" });
 
-    // GSAP animation for headline
+    // GSAP animation for headline - elegant reveal
     gsap.fromTo(
       headline.chars,
       {
-        y: 100,
+        y: 80,
         opacity: 0,
-        rotateX: -90,
+        rotateX: -45,
       },
       {
         y: 0,
         opacity: 1,
         rotateX: 0,
-        duration: 1.2,
-        stagger: 0.02,
-        ease: "power4.out",
-        delay: 0.3,
+        duration: 1.4,
+        stagger: 0.03,
+        ease: "power3.out",
+        delay: 0.5,
       }
     );
 
@@ -96,10 +57,10 @@ export function UpgradedHero() {
       {
         y: 0,
         opacity: 1,
-        duration: 0.8,
-        stagger: 0.03,
-        ease: "power3.out",
-        delay: 0.8,
+        duration: 1,
+        stagger: 0.04,
+        ease: "power2.out",
+        delay: 1.2,
       }
     );
 
@@ -112,82 +73,129 @@ export function UpgradedHero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0b]"
     >
-      {/* 3D Canvas Background */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-60 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
-          <Scene />
-        </Canvas>
+      {/* Luxury Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Gold gradient orb - subtle luxury */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-[800px] h-[800px] rounded-full opacity-20"
+          style={{
+            background: "radial-gradient(circle, rgba(201,169,98,0.15) 0%, transparent 70%)",
+            filter: "blur(100px)",
+          }}
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.15, 0.25, 0.15],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Burgundy accent */}
+        <motion.div
+          className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full opacity-10"
+          style={{
+            background: "radial-gradient(circle, rgba(107,45,60,0.3) 0%, transparent 70%)",
+            filter: "blur(120px)",
+          }}
+          animate={{
+            scale: [1, 1.2, 1],
+            x: [0, 50, 0],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(201,169,98,0.3) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(201,169,98,0.3) 1px, transparent 1px)`,
+            backgroundSize: "100px 100px",
+          }}
+        />
       </div>
 
+      {/* Main Content */}
       <motion.div
-        className="relative z-10 max-w-7xl mx-auto px-6 text-center"
+        className="relative z-10 max-w-6xl mx-auto px-6 lg:px-8 text-center"
         style={{ y, opacity }}
       >
-        {/* Badge */}
+        {/* Luxury Badge */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-10"
+          style={{
+            background: "rgba(201, 169, 98, 0.08)",
+            border: "1px solid rgba(201, 169, 98, 0.15)",
+          }}
         >
-          <span className="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse" />
-          <span className="text-sm font-medium text-[var(--foreground)]/80">
-            Digital Marketing Agency
+          <span className="w-1.5 h-1.5 rounded-full bg-[#c9a962] animate-pulse" />
+          <span className="text-xs font-medium tracking-[0.2em] uppercase text-[#c9a962]">
+            Digital Excellence
           </span>
         </motion.div>
 
-        {/* Main Headline with Kinetic Typography */}
+        {/* Main Headline - Luxury Typography */}
         <h1
           ref={headlineRef}
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-tight mb-8 perspective-1000"
+          className="font-[family-name:var(--font-playfair)] text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-medium leading-[0.95] tracking-[-0.02em] mb-8 perspective-1000"
         >
-          <span className="block text-[var(--foreground)]">We Craft</span>
-          <span className="block text-gradient mt-2">Digital</span>
-          <span className="block text-[var(--primary)] mt-2">Excellence</span>
+          <span className="block text-[#faf8f5]">We Craft</span>
+          <span className="block text-gradient-gold mt-2">Digital</span>
+          <span className="block text-[#faf8f5] mt-2">Luxury</span>
         </h1>
 
         {/* Subheadline */}
         <p
           ref={subheadRef}
-          className="max-w-2xl mx-auto text-lg sm:text-xl text-[var(--muted-foreground)] mb-12 leading-relaxed"
+          className="max-w-2xl mx-auto text-lg sm:text-xl text-[#a8a5a0] mb-14 leading-relaxed font-[family-name:var(--font-inter)]"
         >
-          Transforming brands through innovative digital strategies, 
-          data-driven campaigns, and creative excellence that delivers results.
+          Award-winning digital marketing agency transforming premium brands through 
+          innovative strategies, data-driven campaigns, and uncompromising excellence.
         </p>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons - Luxury Style */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.2 }}
+          transition={{ duration: 0.8, delay: 1.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a
             href="#contact"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[var(--primary)] text-[var(--background)] font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105"
+            className="group relative inline-flex items-center gap-3 px-10 py-5 bg-[#c9a962] text-[#0a0a0b] font-medium text-sm tracking-wide rounded-lg overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(201,169,98,0.3)] hover:-translate-y-0.5"
             data-cursor-text="Let's Go"
           >
             <span className="relative z-10">Start Your Project</span>
             <svg
-              className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
+              className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#e8d5a3] to-[#c9a962] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </a>
 
           <a
             href="#work"
-            className="group inline-flex items-center gap-3 px-8 py-4 glass text-[var(--foreground)] font-semibold rounded-full transition-all duration-300 hover:bg-[var(--primary)]/10"
+            className="group inline-flex items-center gap-3 px-10 py-5 text-[#faf8f5] font-medium text-sm tracking-wide rounded-lg border border-[rgba(201,169,98,0.25)] transition-all duration-500 hover:border-[#c9a962] hover:bg-[rgba(201,169,98,0.05)] hover:-translate-y-0.5"
           >
             <span>View Our Work</span>
             <svg
-              className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
+              className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -198,52 +206,53 @@ export function UpgradedHero() {
           </a>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stats Row - Premium Display */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.4 }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
+          transition={{ duration: 1, delay: 1.8 }}
+          className="mt-24 pt-12 border-t border-[rgba(255,255,255,0.06)]"
         >
-          {[
-            { value: "200+", label: "Projects Delivered" },
-            { value: "$50M+", label: "Revenue Generated" },
-            { value: "98%", label: "Client Retention" },
-            { value: "15+", label: "Industry Awards" },
-          ].map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.6 + i * 0.1 }}
-              className="text-center group"
-            >
-              <div className="text-3xl sm:text-4xl font-bold text-gradient mb-1 group-hover:scale-110 transition-transform">
-                {stat.value}
-              </div>
-              <div className="text-sm text-[var(--muted-foreground)]">{stat.label}</div>
-            </motion.div>
-          ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { value: "$50M+", label: "Revenue Generated" },
+              { value: "200+", label: "Premium Clients" },
+              { value: "98%", label: "Retention Rate" },
+              { value: "15+", label: "Industry Awards" },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2 + i * 0.1 }}
+                className="text-center group cursor-default"
+              >
+                <div className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl lg:text-5xl text-gradient-gold mb-2 transition-transform duration-500 group-hover:scale-105">
+                  {stat.value}
+                </div>
+                <div className="text-xs tracking-[0.15em] uppercase text-[#6b6863]">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </motion.div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator - Minimal Luxury */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        transition={{ delay: 2.5 }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2"
       >
         <motion.div
-          animate={{ y: [0, 10, 0] }}
+          animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="w-6 h-10 rounded-full border-2 border-[var(--foreground)]/20 flex items-start justify-center p-2"
+          className="flex flex-col items-center gap-3"
         >
-          <motion.div
-            animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1 h-2 bg-[var(--primary)] rounded-full"
-          />
+          <span className="text-[10px] tracking-[0.3em] uppercase text-[#6b6863]">Scroll</span>
+          <div className="w-px h-12 bg-gradient-to-b from-[#c9a962] to-transparent" />
         </motion.div>
       </motion.div>
     </section>

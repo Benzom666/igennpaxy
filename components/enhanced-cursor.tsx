@@ -9,17 +9,22 @@ export function EnhancedCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
   const [cursorText, setCursorText] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
 
   const cursorX = useMotionValue(0);
   const cursorY = useMotionValue(0);
 
-  const springConfig = { damping: 25, stiffness: 400 };
+  const springConfig = { damping: 30, stiffness: 300 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   useEffect(() => {
     // Check for touch device
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (typeof window === "undefined" || window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+
+    setIsVisible(true);
 
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX);
@@ -74,14 +79,14 @@ export function EnhancedCursor() {
     };
   }, [cursorX, cursorY]);
 
-  // Hide on mobile
-  if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
+  // Don't render on mobile/touch devices
+  if (!isVisible) {
     return null;
   }
 
   return (
     <>
-      {/* Main cursor ring */}
+      {/* Main cursor ring - Luxury Gold Style */}
       <motion.div
         ref={cursorRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
@@ -91,17 +96,17 @@ export function EnhancedCursor() {
         }}
       >
         <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--primary)] flex items-center justify-center"
+          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#c9a962] flex items-center justify-center"
           animate={{
             width: isHovering ? (cursorText ? 100 : 60) : 40,
             height: isHovering ? (cursorText ? 100 : 60) : 40,
-            backgroundColor: isHovering ? "rgba(26, 255, 128, 0.1)" : "transparent",
+            backgroundColor: isHovering ? "rgba(201, 169, 98, 0.08)" : "transparent",
             scale: isClicking ? 0.9 : 1,
           }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          transition={{ type: "spring", damping: 25, stiffness: 350 }}
         >
           {cursorText && (
-            <span className="text-xs font-medium text-[var(--primary)]">{cursorText}</span>
+            <span className="text-[10px] font-medium tracking-wide text-[#c9a962]">{cursorText}</span>
           )}
         </motion.div>
       </motion.div>
@@ -109,14 +114,14 @@ export function EnhancedCursor() {
       {/* Cursor dot */}
       <motion.div
         ref={cursorDotRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 pointer-events-none z-[9999]"
         style={{
           x: cursorX,
           y: cursorY,
         }}
       >
         <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[var(--primary)]"
+          className="relative -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#c9a962]"
           animate={{
             scale: isClicking ? 0.5 : 1,
             opacity: isHovering ? 0 : 1,

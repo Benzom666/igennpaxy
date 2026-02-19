@@ -11,6 +11,10 @@ export function FluidBackground() {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
     const container = containerRef.current;
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -22,15 +26,15 @@ export function FluidBackground() {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ 
       alpha: true, 
-      antialias: true,
+      antialias: false, // Performance optimization
       powerPreference: "high-performance"
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Limit pixel ratio for performance
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Shader material for fluid effect
+    // Shader material for luxury fluid effect
     const vertexShader = `
       varying vec2 vUv;
       void main() {
@@ -101,31 +105,31 @@ export function FluidBackground() {
         vec2 uv = vUv;
         vec2 mouse = uMouse * 0.5 + 0.5;
         
-        // Create flowing noise
-        float noise1 = snoise(vec3(uv * 2.0, uTime * 0.1));
-        float noise2 = snoise(vec3(uv * 4.0 + 100.0, uTime * 0.15));
-        float noise3 = snoise(vec3(uv * 1.0 + 200.0, uTime * 0.08));
+        // Create flowing noise - slower for luxury feel
+        float noise1 = snoise(vec3(uv * 1.5, uTime * 0.05));
+        float noise2 = snoise(vec3(uv * 3.0 + 100.0, uTime * 0.08));
+        float noise3 = snoise(vec3(uv * 0.8 + 200.0, uTime * 0.04));
         
-        // Mouse interaction
+        // Mouse interaction - subtle
         float mouseDist = distance(uv, mouse);
-        float mouseInfluence = smoothstep(0.5, 0.0, mouseDist) * 0.3;
+        float mouseInfluence = smoothstep(0.4, 0.0, mouseDist) * 0.2;
         
         // Combine noises
         float finalNoise = noise1 * 0.5 + noise2 * 0.25 + noise3 * 0.25;
         finalNoise += mouseInfluence;
         
-        // Colors - emerald green palette matching the site
-        vec3 color1 = vec3(0.05, 0.08, 0.06); // Dark background
-        vec3 color2 = vec3(0.1, 0.9, 0.4);    // Primary green
-        vec3 color3 = vec3(0.85, 0.5, 0.3);   // Accent orange
+        // Luxury Colors - Gold/Bronze palette
+        vec3 color1 = vec3(0.04, 0.04, 0.05); // Rich dark background
+        vec3 color2 = vec3(0.79, 0.66, 0.38); // Gold (#c9a962)
+        vec3 color3 = vec3(0.42, 0.18, 0.24); // Burgundy (#6b2d3c)
         
         // Mix colors based on noise
-        vec3 color = mix(color1, color2, smoothstep(-0.3, 0.5, finalNoise) * 0.15);
-        color = mix(color, color3, smoothstep(0.3, 0.8, finalNoise + mouseInfluence) * 0.08);
+        vec3 color = mix(color1, color2, smoothstep(-0.3, 0.5, finalNoise) * 0.08);
+        color = mix(color, color3, smoothstep(0.3, 0.8, finalNoise + mouseInfluence) * 0.05);
         
         // Add subtle vignette
         float vignette = 1.0 - smoothstep(0.3, 1.2, length(uv - 0.5));
-        color *= vignette * 0.3 + 0.7;
+        color *= vignette * 0.4 + 0.6;
         
         gl_FragColor = vec4(color, 1.0);
       }
@@ -147,24 +151,33 @@ export function FluidBackground() {
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // Mouse tracking
+    // Mouse tracking - throttled
     let mouseX = 0;
     let mouseY = 0;
+    let lastMouseMove = 0;
     const handleMouseMove = (e: MouseEvent) => {
+      const now = Date.now();
+      if (now - lastMouseMove < 16) return; // Throttle to ~60fps
+      lastMouseMove = now;
       mouseX = (e.clientX / width) * 2 - 1;
       mouseY = -(e.clientY / height) * 2 + 1;
     };
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // Animation loop
+    // Animation loop with frame skipping for performance
     let isActive = true;
+    let frameCount = 0;
     const animate = () => {
       if (!isActive) return;
       frameRef.current = requestAnimationFrame(animate);
       
+      // Render every 2nd frame for performance (30fps)
+      frameCount++;
+      if (frameCount % 2 !== 0) return;
+      
       uniforms.uTime.value += 0.016;
-      uniforms.uMouse.value.x += (mouseX - uniforms.uMouse.value.x) * 0.05;
-      uniforms.uMouse.value.y += (mouseY - uniforms.uMouse.value.y) * 0.05;
+      uniforms.uMouse.value.x += (mouseX - uniforms.uMouse.value.x) * 0.03;
+      uniforms.uMouse.value.y += (mouseY - uniforms.uMouse.value.y) * 0.03;
       
       renderer.render(scene, camera);
     };
@@ -198,7 +211,7 @@ export function FluidBackground() {
       ref={containerRef}
       className="fixed inset-0 -z-10"
       style={{ 
-        background: "linear-gradient(180deg, #0a0f0c 0%, #050705 100%)",
+        background: "linear-gradient(180deg, #0a0a0b 0%, #080809 100%)",
       }}
     />
   );
